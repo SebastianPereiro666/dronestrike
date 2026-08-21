@@ -309,6 +309,7 @@ function invMix(m){return{t:(m[0]+m[1]+m[2]+m[3])/4,p:((m[2]+m[3])-(m[0]+m[1]))/
 var rc={t:0,y:0,p:0,r:0},des={t:0,y:0,p:0,r:0},motor=[0,0,0,0];
 var heading=0,vx=0,vy=0,h=0,camX=320,camY=500,elapsed=0;
 var drag=[0,0,0,0],padAct={l:false,r:false};
+var MOTOR_DEADZONE=0.08;
 
 var slEl=[],grid=$('qcst-slgrid');
 for(i=0;i<4;i++){
@@ -382,7 +383,7 @@ function frame(now){
  var k=Math.min(1,dt*9);
  rc.t+=(des.t-rc.t)*k;rc.y+=(des.y-rc.y)*k;rc.p+=(des.p-rc.p)*k;rc.r+=(des.r-rc.r)*k;
  var mt=mixer(rc);
- for(i=0;i<4;i++)motor[i]+=(clamp(mt[i],0,1)-motor[i])*Math.min(1,dt*5);
+ for(i=0;i<4;i++){var m=clamp(mt[i],0,1);motor[i]+=(m<motor[i]?Math.max(0,m-MOTOR_DEADZONE)-motor[i]:m-motor[i])*Math.min(1,dt*5);}
  var T=(motor[0]+motor[1]+motor[2]+motor[3])/4,
      P=((motor[2]+motor[3])-(motor[0]+motor[1]))/4,
      Rr=((motor[0]+motor[2])-(motor[1]+motor[3]))/4,
